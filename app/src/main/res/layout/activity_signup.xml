@@ -5,22 +5,36 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:background="@drawable/attachment"
     tools:context=".SignupActivity">
+
+    <TextView
+        android:id="@+id/appName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="200dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/app_name"
+        android:textSize="50sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
     <EditText
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/signupUsername"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="370dp"
+        android:layout_marginTop="300dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/edittext_border"
         android:hint="Username"
         android:padding="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appName"/>
 
     <EditText
         android:id="@+id/signupPassword"
@@ -45,8 +59,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="50dp"
         android:layout_marginEnd="16dp"
-        android:backgroundTint="@color/green"
-        android:text="SIGNUP"
+        android:backgroundTint="@color/blue"
+        android:text="Sign up"
         app:layout_constraintBottom_toTopOf="@+id/loginRedirect"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -58,8 +72,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="70dp"
         android:gravity="center"
-        android:text="Already registered? Login"
-        android:textColor="@color/green"
+        android:text="Already registered? Sign in"
+        android:textColor="@color/blue"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

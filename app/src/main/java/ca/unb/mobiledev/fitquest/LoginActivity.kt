@@ -41,6 +41,8 @@ class LoginActivity : AppCompatActivity() {
             startActivity(Intent(this@LoginActivity, SignupActivity::class.java))
             finish()
         }
+
+        supportActionBar?.hide()
     }
 
     private fun loginUser(username: String, password: String){

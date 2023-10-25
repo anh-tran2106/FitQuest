@@ -5,8 +5,5 @@
     <color name="green">#4fa853</color>
     <color name="blue">#414BB2</color>
 
-    <color name="primaryTextColor">#FF000000</color>
-
-
-
+    <color name="primaryTextColor">#FFFFFFFF</color>
 </resources>

@@ -1,10 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.FitQuest" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-         <item name="colorPrimary">@color/blue</item>
-         <item name="colorPrimaryVariant">@color/blue</item>
-         <item name="android:statusBarColor">@color/blue</item>
+    <style name="Base.Theme.FitQuest" parent="Theme.Material3.DayNight">
+<!--        &lt;!&ndash; Customize your light theme here. &ndash;&gt;-->
+<!--         <item name="android:navigationBarColor">@color/white</item>-->
+<!--        <item name="actionBarStyle">@style/MyActionBar</item>-->
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="Theme.FitQuest" parent="Base.Theme.FitQuest" />
