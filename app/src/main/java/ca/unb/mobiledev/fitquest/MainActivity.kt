@@ -1,6 +1,7 @@
 package ca.unb.mobiledev.fitquest
 
 import android.content.Context
+import android.content.Intent
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -66,6 +67,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             true
         }
 
+        val stepCardView = findViewById<com.google.android.material.card.MaterialCardView>(R.id.stepCardView)
+        stepCardView.setOnClickListener {
+            val intent = Intent(this@MainActivity, StepCounterActivity::class.java)
+            startActivity(intent)
+        }
+
         loadData()
         resetSteps()
 
@@ -97,7 +104,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent?) {
         val stepsTaken : TextView = findViewById(R.id.stepsTaken)
-        val stepProgressBar : com.mikhaellopez.circularprogressbar.CircularProgressBar = findViewById(R.id.stepProgressBar)
+        val stepProgressBar : com.google.android.material.progressindicator.LinearProgressIndicator = findViewById(R.id.stepProgressBar)
 
 
         if (running) {
@@ -106,15 +113,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
             stepsTaken.text = ("$currentSteps")
 
-            stepProgressBar.apply {
-                setProgressWithAnimation(currentSteps.toFloat())
-            }
+            stepProgressBar.setProgressCompat(currentSteps, true)
         }
     }
 
     private fun resetSteps() {
         val stepsTaken : TextView = findViewById(R.id.stepsTaken)
-        val stepProgressBar : com.mikhaellopez.circularprogressbar.CircularProgressBar = findViewById(R.id.stepProgressBar)
+        val stepProgressBar : com.google.android.material.progressindicator.LinearProgressIndicator = findViewById(R.id.stepProgressBar)
         stepProgressBar.setOnClickListener {
             Toast.makeText(this, "Long tap to reset steps", Toast.LENGTH_SHORT).show()
         }
