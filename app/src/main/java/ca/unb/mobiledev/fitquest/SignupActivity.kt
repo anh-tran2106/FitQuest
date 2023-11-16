@@ -1,29 +1,30 @@
 package ca.unb.mobiledev.fitquest
 
+import android.content.ContentValues.TAG
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import ca.unb.mobiledev.fitquest.databinding.ActivitySignupBinding
+import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.firestore
 
 class SignupActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySignupBinding
-    private lateinit var firebaseDatabase: FirebaseDatabase
-    private lateinit var databaseReference: DatabaseReference
+
+    private val db = Firebase.firestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySignupBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        firebaseDatabase = FirebaseDatabase.getInstance()
-        databaseReference = firebaseDatabase.reference.child("users")
 
         binding.signupButton.setOnClickListener{
             val signupUsername = binding.signupUsername.text.toString()
@@ -45,25 +46,37 @@ class SignupActivity : AppCompatActivity() {
         supportActionBar?.hide()
     }
 
-    private fun signupUser(username: String, password: String){
-        databaseReference.orderByChild("username").equalTo(username).addListenerForSingleValueEvent(object : ValueEventListener{
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if(!dataSnapshot.exists()){
-                    val id = databaseReference.push().key
-                    val userData = UserData(id, username, password)
-                    databaseReference.child(id!!).setValue(userData)
-                    Toast.makeText(this@SignupActivity, "Signup Successful!", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this@SignupActivity, LoginActivity::class.java))
-                    finish()
-                }
-                else{
-                    Toast.makeText(this@SignupActivity, "User already exists!", Toast.LENGTH_SHORT).show()
+    private fun signupUser(username: String, password: String) {
+        val usersRef = db.collection("users")
+        val query = usersRef.whereEqualTo("username", username)
+        query.get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                for (documentSnapshot in task.result!!) {
+                    val user = documentSnapshot.getString("username")
+
+                    if (user == username) {
+                        Toast.makeText(this@SignupActivity, "Username already exists!", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
 
-            override fun onCancelled(databaseError: DatabaseError){
-                Toast.makeText(this@SignupActivity, "Database Error: ${databaseError.message}", Toast.LENGTH_SHORT).show()
+            if (task.result!!.size() == 0) {
+                val user = hashMapOf(
+                    "username" to username,
+                    "password" to password,
+                )
+
+                // Add a new document with a generated ID
+                usersRef
+                    .add(user)
+                    .addOnSuccessListener { documentReference ->
+                        Toast.makeText(this@SignupActivity, "Signup Successful!", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this@SignupActivity, "Signup Unsuccessful!", Toast.LENGTH_SHORT).show()
+                        Log.d(TAG, e.toString())
+                    }
             }
-        })
+        }
     }
 }

@@ -18,6 +18,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
+import java.time.LocalDate
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
     private val requestPermission =
@@ -103,9 +104,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
+        val currentDate = LocalDate.now()
+
         val stepsTaken : TextView = findViewById(R.id.stepsTaken)
         val stepProgressBar : com.google.android.material.progressindicator.LinearProgressIndicator = findViewById(R.id.stepProgressBar)
-
 
         if (running) {
             totalSteps = event!!.values[0]
