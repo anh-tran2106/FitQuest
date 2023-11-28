@@ -3,11 +3,11 @@
 
     <item
         android:id="@+id/miItem1"
-        android:title="Item 1"/>
+        android:title="Edit Profile"/>
     <item
         android:id="@+id/miItem2"
-        android:title="Item 2"/>
+        android:title="Shop"/>
     <item
         android:id="@+id/miItem3"
-        android:title="Item 3"/>
+        android:title="Inventory"/>
 </menu>

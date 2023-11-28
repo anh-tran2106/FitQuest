@@ -60,7 +60,9 @@ class LoginActivity : AppCompatActivity() {
 
                     if (usernameSnapshot != null && passwordSnapshot == password) {
                         Toast.makeText(this@LoginActivity, "Login Successful!", Toast.LENGTH_SHORT).show()
-                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                        intent.putExtra("username", usernameSnapshot)
+                        startActivity(intent)
                         finish()
                     } else {
                         Toast.makeText(this@LoginActivity, "Incorrect Password", Toast.LENGTH_SHORT).show()

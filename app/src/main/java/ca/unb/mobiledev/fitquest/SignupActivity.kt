@@ -60,17 +60,27 @@ class SignupActivity : AppCompatActivity() {
                 }
             }
 
+
+
             if (task.result!!.size() == 0) {
+                val allDays: Map<String, Any> = emptyMap()
                 val user = hashMapOf(
                     "username" to username,
                     "password" to password,
+                    "health"   to 100,
+                    "exp"      to 100,
+                    "level"    to 1,
+                    "coin"     to 0,
+                    "allDays"  to allDays
                 )
 
                 // Add a new document with a generated ID
                 usersRef
-                    .add(user)
+                    .document(username).set(user)
                     .addOnSuccessListener { documentReference ->
                         Toast.makeText(this@SignupActivity, "Signup Successful!", Toast.LENGTH_SHORT).show()
+                        startActivity(Intent(this@SignupActivity,  LoginActivity::class.java))
+
                     }
                     .addOnFailureListener { e ->
                         Toast.makeText(this@SignupActivity, "Signup Unsuccessful!", Toast.LENGTH_SHORT).show()

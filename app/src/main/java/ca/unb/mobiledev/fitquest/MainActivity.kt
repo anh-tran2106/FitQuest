@@ -1,5 +1,6 @@
 package ca.unb.mobiledev.fitquest
 
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.hardware.Sensor
@@ -18,9 +19,14 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
+    private val db = Firebase.firestore
+
     private val requestPermission =
 
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -54,6 +60,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.elevation = 0F
+        supportActionBar?.title = intent.getStringExtra("username")
 
         val navView = findViewById<NavigationView>(R.id.navView)
         navView.setNavigationItemSelectedListener {
@@ -75,9 +82,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
 
         loadData()
-        resetSteps()
 
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+    }
+
+    override fun onStart() {
+        super.onStart()
+        updateToDate(intent.getStringExtra("username")!!)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -121,33 +132,64 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private fun resetSteps() {
         val stepsTaken : TextView = findViewById(R.id.stepsTaken)
-        val stepProgressBar : com.google.android.material.progressindicator.LinearProgressIndicator = findViewById(R.id.stepProgressBar)
-        stepProgressBar.setOnClickListener {
-            Toast.makeText(this, "Long tap to reset steps", Toast.LENGTH_SHORT).show()
-        }
-
-        stepProgressBar.setOnLongClickListener {
-            previousTotalSteps = totalSteps
-            stepsTaken.text = 0.toString()
-            saveData()
-            true
-        }
+        previousTotalSteps = totalSteps
+        stepsTaken.text = 0.toString()
+        saveData()
     }
 
     private fun saveData() {
         val sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putFloat("key1", previousTotalSteps)
+        editor.putFloat("previousTotalSteps", previousTotalSteps)
         editor.apply()
     }
 
     private fun loadData() {
         val sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
-        val savedNumber = sharedPreferences.getFloat("key1", 0f)
+        val savedNumber = sharedPreferences.getFloat("previousTotalSteps", 0f)
         Log.d("MainActivity", "$savedNumber")
         previousTotalSteps = savedNumber
+
+
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+    }
+
+    private fun updateToDate(username: String) {
+        val currentTime = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+
+        val userRef = db.collection("users").document(username)
+        val allDaysRef = db.collection("users").document("${username}.allDays")
+        allDaysRef.get().addOnCompleteListener { task ->
+            // Add a new document with a generated ID
+            if (task.isSuccessful) {
+                val documentSnapshot = task.result
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    val dateData = documentSnapshot.data
+
+                    // If current date doesn't exist in allDays, reset step counter
+                    if (dateData != null && !dateData.containsKey(currentTime)) {
+                        resetSteps()
+                    }
+                }
+            }
+            userRef
+                .update(
+                    "allDays.${currentTime}.stepCounter", totalSteps - previousTotalSteps,
+                    "allDays.${currentTime}.waterCounter", 0
+                )
+                .addOnSuccessListener { documentReference ->
+                    Toast.makeText(this@MainActivity, "Today added!", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Error while adding today",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    Log.d(ContentValues.TAG, e.toString())
+                }
+        }
     }
 }
