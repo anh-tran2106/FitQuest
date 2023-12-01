@@ -2,4 +2,8 @@
     <string name="app_name">FitQuest</string>
     <string name="open">Open</string>
     <string name="close">Close</string>
+    <string name="you_drank_this_many_cups_of_water">You drank this many cups of water:</string>
+    <string name="_1water">+1 water</string>
+    <string name="_0">0</string>
+    <string name="_1_water">-1 water</string>
 </resources>

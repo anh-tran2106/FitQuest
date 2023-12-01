@@ -6,6 +6,7 @@
     <color name="red">#ff6565</color>
     <color name="green">#9fd26d</color>
     <color name="yellow">#fac710</color>
+    <color name="lightBlue">#00F6F6</color>
 
     <color name="primaryTextColor">#FFFFFFFF</color>
 </resources>
