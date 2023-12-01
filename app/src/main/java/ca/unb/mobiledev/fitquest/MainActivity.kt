@@ -132,9 +132,17 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private fun resetSteps() {
         val stepsTaken : TextView = findViewById(R.id.stepsTaken)
+        val stepProgressBar : com.mikhaellopez.circularprogressbar.CircularProgressBar = findViewById(R.id.stepProgressBar)
         previousTotalSteps = totalSteps
         stepsTaken.text = 0.toString()
         saveData()
+
+        stepProgressBar.setOnLongClickListener {
+            previousTotalSteps = totalSteps
+            stepsTaken.text = 0.toString()
+            saveData()
+            true
+        }
     }
 
     private fun saveData() {
@@ -149,8 +157,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val savedNumber = sharedPreferences.getFloat("previousTotalSteps", 0f)
         Log.d("MainActivity", "$savedNumber")
         previousTotalSteps = savedNumber
-
-
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
@@ -161,15 +167,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         val userRef = db.collection("users").document(username)
         val allDaysRef = db.collection("users").document("${username}.allDays")
-        allDaysRef.get().addOnCompleteListener { task ->
+        userRef.get().addOnCompleteListener { task ->
             // Add a new document with a generated ID
             if (task.isSuccessful) {
                 val documentSnapshot = task.result
                 if (documentSnapshot != null && documentSnapshot.exists()) {
-                    val dateData = documentSnapshot.data
 
-                    // If current date doesn't exist in allDays, reset step counter
-                    if (dateData != null && !dateData.containsKey(currentTime)) {
+                    // If current date map doesn't exist in allDays, reset step counter
+                    if (!(documentSnapshot.data?.get("allDays") as (HashMap<*, *>)).containsKey(currentTime)) {
                         resetSteps()
                     }
                 }
