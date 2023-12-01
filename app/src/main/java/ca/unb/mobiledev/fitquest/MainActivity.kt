@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,6 +46,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var running = false
     private var totalSteps = 0f
     private var previousTotalSteps = 0f
+    private var waterCounter = 0
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,7 +83,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             startActivity(intent)
         }
 
-        loadData()
+        loadData(intent.getStringExtra("username")!!)
+        changeWaterCounter()
 
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
     }
@@ -130,9 +133,27 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
+    private fun changeWaterCounter() {
+        val waterCounterTextView : TextView = findViewById(R.id.waterTaken)
+        val addWaterButton : Button = findViewById(R.id.addWater)
+        val removeWaterButton : Button = findViewById(R.id.removeWater)
+
+        addWaterButton.setOnClickListener {
+            waterCounter++
+            waterCounterTextView.text = waterCounter.toString()
+        }
+
+        removeWaterButton.setOnClickListener {
+            if (waterCounter > 0) {
+                waterCounter--
+                waterCounterTextView.text = waterCounter.toString()
+            }
+        }
+    }
+
     private fun resetSteps() {
         val stepsTaken : TextView = findViewById(R.id.stepsTaken)
-        val stepProgressBar : com.mikhaellopez.circularprogressbar.CircularProgressBar = findViewById(R.id.stepProgressBar)
+        val stepProgressBar : com.google.android.material.progressindicator.LinearProgressIndicator = findViewById(R.id.stepProgressBar)
         previousTotalSteps = totalSteps
         stepsTaken.text = 0.toString()
         saveData()
@@ -152,11 +173,24 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         editor.apply()
     }
 
-    private fun loadData() {
+    private fun loadData(username : String) {
+        val currentTime = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         val sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
         val savedNumber = sharedPreferences.getFloat("previousTotalSteps", 0f)
         Log.d("MainActivity", "$savedNumber")
         previousTotalSteps = savedNumber
+
+        val userRef = db.collection("users").document(username)
+        val waterCounterTextView : TextView = findViewById(R.id.waterTaken)
+        userRef.get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val documentSnapshot = task.result
+                if (documentSnapshot.exists()) {
+                    waterCounter = ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTime] as (HashMap<*, *>))["waterCounter"].toString().toInt()
+                    waterCounterTextView.text = waterCounter.toString()
+                }
+            }
+        }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
@@ -166,7 +200,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val currentTime = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 
         val userRef = db.collection("users").document(username)
-        val allDaysRef = db.collection("users").document("${username}.allDays")
         userRef.get().addOnCompleteListener { task ->
             // Add a new document with a generated ID
             if (task.isSuccessful) {
@@ -182,7 +215,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             userRef
                 .update(
                     "allDays.${currentTime}.stepCounter", totalSteps - previousTotalSteps,
-                    "allDays.${currentTime}.waterCounter", 0
+                    "allDays.${currentTime}.waterCounter", waterCounter
                 )
                 .addOnSuccessListener { documentReference ->
                     Toast.makeText(this@MainActivity, "Today added!", Toast.LENGTH_SHORT).show()
