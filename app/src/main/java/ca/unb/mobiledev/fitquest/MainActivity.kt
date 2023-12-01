@@ -82,6 +82,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             val intent = Intent(this@MainActivity, StepCounterActivity::class.java)
             startActivity(intent)
         }
+        val waterCardView = findViewById<com.google.android.material.card.MaterialCardView>(R.id.waterCardView)
+        waterCardView.setOnClickListener {
+            val intent = Intent(this@MainActivity, WaterIntake::class.java)
+            startActivity(intent)
+        }
 
         loadData(intent.getStringExtra("username")!!)
         changeWaterCounter()
