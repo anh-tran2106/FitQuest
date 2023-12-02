@@ -46,7 +46,16 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var running = false
     private var totalSteps = 0f
     private var previousTotalSteps = 0f
+    private var maxStep = 0
+    private var maxStepAchieved = false
     private var waterCounter = 0
+    private var maxWater = 0
+
+    private var healthPoint = 100
+    private var expPoint = 0
+    private var maxExpPoint = 100
+    private var level = 0
+    private var coin = 0
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,12 +100,15 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         loadData(intent.getStringExtra("username")!!)
         changeWaterCounter()
 
+        resetStepsForLongClick()
+
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
     }
 
     override fun onStart() {
         super.onStart()
         updateToDate(intent.getStringExtra("username")!!)
+        checkSteptoStepMax()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -142,26 +154,29 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val waterCounterTextView : TextView = findViewById(R.id.waterTaken)
         val addWaterButton : Button = findViewById(R.id.addWater)
         val removeWaterButton : Button = findViewById(R.id.removeWater)
+        val currentExpTextView : TextView = findViewById(R.id.currentExp)
+        val expBar : com.google.android.material.progressindicator.LinearProgressIndicator = findViewById(R.id.expBar)
 
         addWaterButton.setOnClickListener {
             waterCounter++
             waterCounterTextView.text = waterCounter.toString()
+
+            incrementExp(20)
         }
 
         removeWaterButton.setOnClickListener {
-            if (waterCounter > 0) {
+            if (waterCounter > 0 && expPoint > 0) {
                 waterCounter--
                 waterCounterTextView.text = waterCounter.toString()
+
+                incrementExp(-20)
             }
         }
     }
 
-    private fun resetSteps() {
+    private fun resetStepsForLongClick() {
         val stepsTaken : TextView = findViewById(R.id.stepsTaken)
         val stepProgressBar : com.google.android.material.progressindicator.LinearProgressIndicator = findViewById(R.id.stepProgressBar)
-        previousTotalSteps = totalSteps
-        stepsTaken.text = 0.toString()
-        saveData()
 
         stepProgressBar.setOnLongClickListener {
             previousTotalSteps = totalSteps
@@ -169,6 +184,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             saveData()
             true
         }
+    }
+    private fun resetSteps() {
+        val stepsTaken : TextView = findViewById(R.id.stepsTaken)
+
+        previousTotalSteps = totalSteps
+        stepsTaken.text = 0.toString()
+        saveData()
     }
 
     private fun saveData() {
@@ -178,6 +200,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         editor.apply()
     }
 
+    // Load All User Info
     private fun loadData(username : String) {
         val currentTime = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         val sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
@@ -186,13 +209,52 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         previousTotalSteps = savedNumber
 
         val userRef = db.collection("users").document(username)
+
         val waterCounterTextView : TextView = findViewById(R.id.waterTaken)
+        val currentHealthTextView : TextView = findViewById(R.id.currentHealth)
+        val currentExpTextView : TextView = findViewById(R.id.currentExp)
+        val maxExpTextView : TextView = findViewById(R.id.maxExp)
+        val levelTextView : TextView = findViewById(R.id.level)
+        val coinTextView : TextView = findViewById(R.id.coin)
+        val maxStepTextView : TextView = findViewById(R.id.maxStep)
+        val maxWaterTextView: TextView = findViewById(R.id.maxWater)
+        val healthBar : com.google.android.material.progressindicator.LinearProgressIndicator = findViewById(R.id.healthBar)
+        val expBar : com.google.android.material.progressindicator.LinearProgressIndicator = findViewById(R.id.expBar)
+
+
         userRef.get().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val documentSnapshot = task.result
                 if (documentSnapshot.exists()) {
-                    waterCounter = ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTime] as (HashMap<*, *>))["waterCounter"].toString().toInt()
-                    waterCounterTextView.text = waterCounter.toString()
+                    if ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTime] != null) {
+                        waterCounter = ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTime] as (HashMap<*, *>))["waterCounter"].toString().toInt()
+                        waterCounterTextView.text = waterCounter.toString()
+
+                        maxStepAchieved = ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTime] as (HashMap<*, *>))["maxStepAchieved"] as Boolean
+                    }
+
+                    healthPoint = documentSnapshot.data?.get("health").toString().toInt()
+                    currentHealthTextView.text = healthPoint.toString()
+                    healthBar.setProgressCompat(healthPoint, true)
+
+                    expPoint = documentSnapshot.data?.get("exp").toString().toInt()
+                    currentExpTextView.text = expPoint.toString()
+                    expBar.setProgressCompat(expPoint, true)
+
+                    maxExpPoint = documentSnapshot.data?.get("maxExp").toString().toInt()
+                    maxExpTextView.text = maxExpPoint.toString()
+
+                    level = documentSnapshot.data?.get("level").toString().toInt()
+                    levelTextView.text = level.toString()
+
+                    coin = documentSnapshot.data?.get("coin").toString().toInt()
+                    coinTextView.text = coin.toString()
+
+                    maxStep = documentSnapshot.data?.get("maxStep").toString().toInt()
+                    maxStepTextView.text = maxStep.toString()
+
+                    maxWater = documentSnapshot.data?.get("maxWater").toString().toInt()
+                    maxWaterTextView.text = maxWater.toString()
                 }
             }
         }
@@ -219,8 +281,16 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             }
             userRef
                 .update(
+                    "coin", coin,
+                    "exp", expPoint,
+                    "health", healthPoint,
+                    "level", level,
+                    "maxExp", maxExpPoint,
+                    "maxStep", maxStep,
+                    "maxWater", maxWater,
                     "allDays.${currentTime}.stepCounter", totalSteps - previousTotalSteps,
-                    "allDays.${currentTime}.waterCounter", waterCounter
+                    "allDays.${currentTime}.waterCounter", waterCounter,
+                    "allDays.${currentTime}.maxStepAchieved", maxStepAchieved
                 )
                 .addOnSuccessListener { documentReference ->
                     Toast.makeText(this@MainActivity, "Today added!", Toast.LENGTH_SHORT).show()
@@ -233,6 +303,51 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     ).show()
                     Log.d(ContentValues.TAG, e.toString())
                 }
+        }
+    }
+
+    private fun incrementExp(expPointIncrement : Int) {
+        val currentExpTextView : TextView = findViewById(R.id.currentExp)
+        val expBar : com.google.android.material.progressindicator.LinearProgressIndicator = findViewById(R.id.expBar)
+
+        expPoint += expPointIncrement
+        if (expPoint >= maxExpPoint) {
+            levelUp()
+        }
+        else {
+            currentExpTextView.text = expPoint.toString()
+            expBar.setProgressCompat(expPoint, true)
+        }
+    }
+    private fun levelUp() {
+        level++;
+        expPoint = 0
+        maxExpPoint += 50 * (level - 1)
+        coin += 50
+
+        val levelTextView : TextView = findViewById(R.id.level)
+        val currentExpTextView : TextView = findViewById(R.id.currentExp)
+        val maxExpTextView : TextView = findViewById(R.id.maxExp)
+        val coinTextView : TextView = findViewById(R.id.coin)
+        val expBar : com.google.android.material.progressindicator.LinearProgressIndicator = findViewById(R.id.expBar)
+
+        levelTextView.text = level.toString()
+        currentExpTextView.text = expPoint.toString()
+        maxExpTextView.text = maxExpPoint.toString()
+        coinTextView.text = coin.toString()
+        expBar.setProgressCompat(expPoint, true)
+        expBar.max = maxExpPoint
+
+        Toast.makeText(this@MainActivity, "Level Up!", Toast.LENGTH_SHORT).show()
+        updateToDate(intent.getStringExtra("username")!!)
+    }
+
+    private fun checkSteptoStepMax() {
+        if ((totalSteps - previousTotalSteps) >= maxStep && !maxStepAchieved) {
+            incrementExp(100)
+            maxStepAchieved = true
+            updateToDate(intent.getStringExtra("username")!!)
+            Toast.makeText(this@MainActivity, "Step Goal Achieved!", Toast.LENGTH_SHORT).show()
         }
     }
 }

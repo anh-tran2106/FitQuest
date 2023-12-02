@@ -68,9 +68,12 @@ class SignupActivity : AppCompatActivity() {
                     "username" to username,
                     "password" to password,
                     "health"   to 100,
-                    "exp"      to 100,
+                    "exp"      to 0,
+                    "maxExp"   to 100,
                     "level"    to 1,
                     "coin"     to 0,
+                    "maxStep"  to 2500,
+                    "maxWater" to 8,
                     "allDays"  to allDays
                 )
 

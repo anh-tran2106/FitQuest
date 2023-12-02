@@ -57,7 +57,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="25dp"
                     android:max="100"
-                    android:progress="100"
+                    android:progress="0"
                     app:indicatorColor="@color/red"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
@@ -76,6 +76,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/healthBar">
 
                     <TextView
+                        android:id="@+id/currentHealth"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="100"
@@ -85,7 +86,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="/100"
+                        android:text="/"
+                        android:textColor="@color/primaryTextColor"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="100"
                         android:textColor="@color/primaryTextColor"
                         android:textSize="11sp" />
 
@@ -104,7 +112,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:max="100"
-                    android:progress="50"
+                    android:progress="0"
                     app:indicatorColor="@color/green"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
@@ -123,16 +131,25 @@
                     app:layout_constraintTop_toBottomOf="@+id/expBar">
 
                     <TextView
+                        android:id="@+id/currentExp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="100"
+                        android:text="50"
                         android:textColor="@color/primaryTextColor"
                         android:textSize="11sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="/100"
+                        android:text="/"
+                        android:textColor="@color/primaryTextColor"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/maxExp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="100"
                         android:textColor="@color/primaryTextColor"
                         android:textSize="11sp" />
 
@@ -145,30 +162,57 @@
                         android:textSize="11sp" />
                 </LinearLayout>
 
+
                 <LinearLayout
                     android:layout_width="220dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:gravity="end"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/expInfo">
 
-                    <ImageView
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
-                        android:contentDescription="coin"
-                        android:src="@drawable/coin" />
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="3dp"
-                        android:gravity="end"
-                        android:text="150"
-                        android:textColor="@color/yellow"
+                        android:text="Level"
+                        android:textColor="@color/primaryTextColor"
                         android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/level"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:text="100"
+                        android:textColor="@color/primaryTextColor"
+                        android:textSize="11sp" />
+
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:text="Experience"
+                        android:textColor="@color/primaryTextColor"
+                        android:textSize="11sp">
+
+                        <ImageView
+                            android:layout_width="15dp"
+                            android:layout_height="15dp"
+                            android:contentDescription="coin"
+                            android:src="@drawable/coin" />
+
+                        <TextView
+                            android:id="@+id/coin"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="3dp"
+                            android:text="0"
+                            android:textColor="@color/yellow"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
+
 
                 </LinearLayout>
 
@@ -200,6 +244,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"
                     android:max="2500"
+                    android:progress="0"
                     app:trackCornerRadius="10dp"
                     app:trackThickness="10dp"
                     app:indicatorColor="@color/blue"
@@ -240,12 +285,21 @@
                         android:textSize="25sp" />
 
                     <TextView
-                        android:id="@+id/stepMax"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="0dp"
                         android:layout_marginEnd="64dp"
-                        android:text="/2500"
+                        android:text="/"
+                        android:textColor="@color/primaryTextColor"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/maxStep"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="0dp"
+                        android:layout_marginEnd="64dp"
+                        android:text="2500"
                         android:textColor="@color/primaryTextColor"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -341,21 +395,29 @@
                         android:textSize="25sp" />
 
                     <TextView
-                        android:id="@+id/waterMax"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="0dp"
                         android:layout_marginEnd="64dp"
-                        android:text="/8"
+                        android:text="/"
                         android:textColor="@color/primaryTextColor"
                         android:textSize="15sp" />
 
                     <TextView
-                        android:id="@+id/cupsText"
+                        android:id="@+id/maxWater"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="0dp"
+                        android:layout_marginEnd="64dp"
+                        android:text="8"
+                        android:textColor="@color/primaryTextColor"
+                        android:textSize="15sp" />
+
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="3dp"
-                        android:text="cups"
+                        android:text="glasses"
                         android:textColor="@color/primaryTextColor"
                         android:textSize="15sp" />
                 </LinearLayout>
