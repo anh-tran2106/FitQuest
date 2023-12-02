@@ -1,7 +1,7 @@
 package ca.unb.mobiledev.fitquest
 
 import android.content.ContentValues
-import androidx.appcompat.app.AppCompatActivity
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,6 +10,12 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import com.github.mikephil.charting.animation.Easing
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.Firebase
@@ -63,6 +69,9 @@ class StepCounterActivity : AppCompatActivity() {
 
             alertDialog.show()
         }
+
+        loadDataToChart(username)
+
     }
 
     private fun loadData(username: String) {
@@ -116,4 +125,41 @@ class StepCounterActivity : AppCompatActivity() {
         }
     }
 
+    // Load all Step Counter data for 7 days up to the current date to the chart
+    private fun loadDataToChart(username: String) {
+        val currentTimeNoFormat = LocalDate.now()
+        val currentTime = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        val userRef = db.collection("users").document(username)
+
+        val barChart = findViewById<BarChart>(R.id.stepChart_stepScreen)
+        val dataList: ArrayList<BarEntry> = ArrayList()
+
+        var stepCounter: Float
+        val stepList: MutableList<Float> = ArrayList()
+        var counter = 0
+        userRef.get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val documentSnapshot = task.result
+                if (documentSnapshot.exists()) {
+                    for (i in 6 downTo 0) {
+                        stepCounter = 0f
+                        if ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTimeNoFormat.minusDays(i.toLong()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))] != null) {
+                            stepCounter = ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTimeNoFormat.minusDays(i.toLong()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))] as (HashMap<*, *>))["stepCounter"].toString().toFloat()
+                        }
+                        dataList.add(BarEntry(counter.toFloat(), stepCounter))
+                        counter++;
+                    }
+
+                    val barDataSet = BarDataSet(dataList,"Steps")
+                    barDataSet.color = Color.rgb(65, 75, 178)
+                    val barData = BarData(barDataSet)
+
+                    barChart.setFitBars(true)
+                    barChart.data = barData
+                    barChart.description.text =""
+                    barChart.animateY(700, Easing.EaseOutSine)
+                }
+            }
+        }
+    }
 }
