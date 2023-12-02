@@ -178,9 +178,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val stepsTaken : TextView = findViewById(R.id.stepsTaken)
         val stepProgressBar : com.google.android.material.progressindicator.LinearProgressIndicator = findViewById(R.id.stepProgressBar)
 
+        stepProgressBar.setOnClickListener {
+            Toast.makeText(this@MainActivity, "Long tap to reset step progress", Toast.LENGTH_SHORT).show()
+        }
+
         stepProgressBar.setOnLongClickListener {
             previousTotalSteps = totalSteps
             stepsTaken.text = 0.toString()
+            stepProgressBar.setProgressCompat(0, true)
             saveData()
             true
         }
@@ -220,6 +225,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val maxWaterTextView: TextView = findViewById(R.id.maxWater)
         val healthBar : com.google.android.material.progressindicator.LinearProgressIndicator = findViewById(R.id.healthBar)
         val expBar : com.google.android.material.progressindicator.LinearProgressIndicator = findViewById(R.id.expBar)
+        val stepProgressBar : com.google.android.material.progressindicator.LinearProgressIndicator = findViewById(R.id.stepProgressBar)
 
 
         userRef.get().addOnCompleteListener { task ->
@@ -243,6 +249,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
                     maxExpPoint = documentSnapshot.data?.get("maxExp").toString().toInt()
                     maxExpTextView.text = maxExpPoint.toString()
+                    expBar.max = maxExpPoint
 
                     level = documentSnapshot.data?.get("level").toString().toInt()
                     levelTextView.text = level.toString()
@@ -252,6 +259,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
                     maxStep = documentSnapshot.data?.get("maxStep").toString().toInt()
                     maxStepTextView.text = maxStep.toString()
+                    stepProgressBar.max = maxStep
 
                     maxWater = documentSnapshot.data?.get("maxWater").toString().toInt()
                     maxWaterTextView.text = maxWater.toString()

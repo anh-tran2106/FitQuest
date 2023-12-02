@@ -338,25 +338,25 @@
                     app:layout_constraintVertical_bias="0.5">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/addWater"
+                        android:id="@+id/removeWater"
                         style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:backgroundTint="@color/blue"
                         android:stateListAnimator="@null"
-                        android:text="+"
+                        android:text="-"
                         android:textSize="18dp"
                         app:cornerRadius="25dp" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/removeWater"
+                        android:id="@+id/addWater"
                         style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:layout_marginStart="15dp"
                         android:backgroundTint="@color/blue"
                         android:stateListAnimator="@null"
-                        android:text="-"
+                        android:text="+"
                         android:textSize="18dp"
                         app:cornerRadius="25dp" />
 
