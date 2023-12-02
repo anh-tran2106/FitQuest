@@ -89,6 +89,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val stepCardView = findViewById<com.google.android.material.card.MaterialCardView>(R.id.stepCardView)
         stepCardView.setOnClickListener {
             val intent = Intent(this@MainActivity, StepCounterActivity::class.java)
+            intent.putExtra("username", this.intent.getStringExtra("username"))
             startActivity(intent)
         }
         val waterCardView = findViewById<com.google.android.material.card.MaterialCardView>(R.id.waterCardView)
@@ -107,8 +108,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     override fun onStart() {
         super.onStart()
+        loadData(intent.getStringExtra("username")!!)
+    }
+
+    override fun onStop() {
+        super.onStop()
         updateToDate(intent.getStringExtra("username")!!)
-        checkSteptoStepMax()
+        checkStepGoalAchieved()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -135,8 +141,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        val currentDate = LocalDate.now()
-
         val stepsTaken : TextView = findViewById(R.id.stepsTaken)
         val stepProgressBar : com.google.android.material.progressindicator.LinearProgressIndicator = findViewById(R.id.stepProgressBar)
 
@@ -154,8 +158,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val waterCounterTextView : TextView = findViewById(R.id.waterTaken)
         val addWaterButton : Button = findViewById(R.id.addWater)
         val removeWaterButton : Button = findViewById(R.id.removeWater)
-        val currentExpTextView : TextView = findViewById(R.id.currentExp)
-        val expBar : com.google.android.material.progressindicator.LinearProgressIndicator = findViewById(R.id.expBar)
 
         addWaterButton.setOnClickListener {
             waterCounter++
@@ -300,7 +302,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     "allDays.${currentTime}.waterCounter", waterCounter,
                     "allDays.${currentTime}.maxStepAchieved", maxStepAchieved
                 )
-                .addOnSuccessListener { documentReference ->
+                .addOnSuccessListener {
                     Toast.makeText(this@MainActivity, "Today added!", Toast.LENGTH_SHORT).show()
                 }
                 .addOnFailureListener { e ->
@@ -328,7 +330,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
     }
     private fun levelUp() {
-        level++;
+        level++
         expPoint = 0
         maxExpPoint += 50 * (level - 1)
         coin += 50
@@ -350,7 +352,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         updateToDate(intent.getStringExtra("username")!!)
     }
 
-    private fun checkSteptoStepMax() {
+    private fun checkStepGoalAchieved() {
         if ((totalSteps - previousTotalSteps) >= maxStep && !maxStepAchieved) {
             incrementExp(100)
             maxStepAchieved = true

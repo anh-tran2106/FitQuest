@@ -192,7 +192,6 @@
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:gravity="end"
-                        android:text="Experience"
                         android:textColor="@color/primaryTextColor"
                         android:textSize="11sp">
 
