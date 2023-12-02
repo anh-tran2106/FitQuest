@@ -20,6 +20,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -70,8 +72,15 @@ class StepCounterActivity : AppCompatActivity() {
             alertDialog.show()
         }
 
-        loadDataToChart(username)
+        sendDataToScreen(username)
+    }
 
+    override fun onStart() {
+        super.onStart()
+
+        val username = intent.getStringExtra("username")!!
+
+        loadData(username)
     }
 
     private fun loadData(username: String) {
@@ -125,26 +134,27 @@ class StepCounterActivity : AppCompatActivity() {
         }
     }
 
-    // Load all Step Counter data for 7 days up to the current date to the chart
-    private fun loadDataToChart(username: String) {
+    private fun sendDataToScreen(username: String) {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val currentTimeNoFormat = LocalDate.now()
-        val currentTime = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        val currentTime = LocalDate.now().format(formatter)
         val userRef = db.collection("users").document(username)
 
         val barChart = findViewById<BarChart>(R.id.stepChart_stepScreen)
         val dataList: ArrayList<BarEntry> = ArrayList()
 
         var stepCounter: Float
-        val stepList: MutableList<Float> = ArrayList()
         var counter = 0
         userRef.get().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val documentSnapshot = task.result
                 if (documentSnapshot.exists()) {
+
+                    // Update step data for 7 days up to the current date to the chart
                     for (i in 6 downTo 0) {
                         stepCounter = 0f
-                        if ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTimeNoFormat.minusDays(i.toLong()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))] != null) {
-                            stepCounter = ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTimeNoFormat.minusDays(i.toLong()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))] as (HashMap<*, *>))["stepCounter"].toString().toFloat()
+                        if ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTimeNoFormat.minusDays(i.toLong()).format(formatter)] != null) {
+                            stepCounter = ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTimeNoFormat.minusDays(i.toLong()).format(formatter)] as (HashMap<*, *>))["stepCounter"].toString().toFloat()
                         }
                         dataList.add(BarEntry(counter.toFloat(), stepCounter))
                         counter++;
@@ -158,8 +168,34 @@ class StepCounterActivity : AppCompatActivity() {
                     barChart.data = barData
                     barChart.description.text =""
                     barChart.animateY(700, Easing.EaseOutSine)
+
+                    // Update distance and calories burnt according to total steps
+                    if ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTime] != null) {
+                        stepCounter = ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTime] as (HashMap<*, *>))["stepCounter"].toString().toFloat()
+                        convertStepToKm(stepCounter)
+                        convertStepToCal(stepCounter)
+                    }
                 }
             }
         }
+    }
+
+    // Convert Total Steps to Km and change the Text View
+    private fun convertStepToKm(totalSteps: Float) {
+        val magicNumber = 1312.335958
+        val distanceTextView: TextView = findViewById(R.id.distance_StepScreen)
+        val df = DecimalFormat("#.##")
+        df.roundingMode = RoundingMode.CEILING
+
+        val km = (totalSteps) / magicNumber
+        distanceTextView.text = df.format(km).toDouble().toString()
+    }
+
+    private fun convertStepToCal(totalSteps: Float) {
+        val magicNumber = 28.985507
+        val calTextView: TextView = findViewById(R.id.cal_stepScreen)
+
+        val cal = totalSteps / magicNumber
+        calTextView.text = cal.toInt().toString()
     }
 }

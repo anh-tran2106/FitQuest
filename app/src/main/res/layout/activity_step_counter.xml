@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="290dp"
             android:layout_marginStart="32dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
             android:layout_marginEnd="32dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -94,7 +94,7 @@
                             android:layout_gravity="center"
                             android:text="/"
                             android:textColor="@color/primaryTextColor"
-                            android:textSize="14sp"/>
+                            android:textSize="14sp" />
 
                         <TextView
                             android:id="@+id/maxStep_stepScreen"
@@ -103,7 +103,7 @@
                             android:layout_gravity="center"
                             android:text="0"
                             android:textColor="@color/primaryTextColor"
-                            android:textSize="14sp"/>
+                            android:textSize="14sp" />
                     </LinearLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -138,6 +138,7 @@
                         app:layout_constraintTop_toTopOf="parent">
 
                         <TextView
+                            android:id="@+id/distance_StepScreen"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="1.05" />
