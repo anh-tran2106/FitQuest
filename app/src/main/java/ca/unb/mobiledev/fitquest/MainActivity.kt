@@ -78,14 +78,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         navView.setNavigationItemSelectedListener {
             when(it.itemId) {
                 R.id.miItem1 -> Toast.makeText(applicationContext,
-                    "Clicked Item 1", Toast.LENGTH_SHORT).show()
+                    "Coming soon!", Toast.LENGTH_SHORT).show()
                 R.id.miItem2 -> {
                     val intent = Intent(this@MainActivity, ShopActivity::class.java)
                     intent.putExtra("username", this.intent.getStringExtra("username"))
                     startActivity(intent)
                 }
                 R.id.miItem3 -> Toast.makeText(applicationContext,
-                    "Clicked Item 3", Toast.LENGTH_SHORT).show()
+                    "Coming soon!", Toast.LENGTH_SHORT).show()
             }
             true
         }
