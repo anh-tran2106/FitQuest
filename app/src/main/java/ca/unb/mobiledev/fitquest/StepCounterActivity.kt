@@ -16,6 +16,7 @@ import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.Firebase
@@ -44,6 +45,7 @@ class StepCounterActivity : AppCompatActivity() {
         loadData(username)
 
         val maxStepTextView: TextView = findViewById(R.id.maxStep_stepScreen)
+        val stepProgressCircular: com.mikhaellopez.circularprogressbar.CircularProgressBar = findViewById(R.id.stepProgressCircular_stepScreen)
         val setStepTargetButton: Button = findViewById(R.id.setStepTarget_stepScreen)
         setStepTargetButton.setOnClickListener {
             val view: View = LayoutInflater.from(this@StepCounterActivity).inflate(R.layout.layout_max_step_dialog, null)
@@ -56,6 +58,8 @@ class StepCounterActivity : AppCompatActivity() {
                     if (targetInput.isNotEmpty()) {
                         stepTarget = targetInput.toInt()
                         maxStepTextView.text = stepTarget.toString()
+                        stepProgressCircular.progressMax = stepTarget.toFloat()
+
                         Toast.makeText(this, "Target set to $stepTarget", Toast.LENGTH_SHORT).show()
                         updateStepTarget(intent.getStringExtra("username")!!)
                     } else {
@@ -136,13 +140,14 @@ class StepCounterActivity : AppCompatActivity() {
 
     private fun sendDataToScreen(username: String) {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val monthDateFormatter = DateTimeFormatter.ofPattern("M/d")
         val currentTimeNoFormat = LocalDate.now()
         val currentTime = LocalDate.now().format(formatter)
         val userRef = db.collection("users").document(username)
 
         val barChart = findViewById<BarChart>(R.id.stepChart_stepScreen)
         val dataList: ArrayList<BarEntry> = ArrayList()
-
+        val xAxisLables: MutableList<String> = ArrayList()
         var stepCounter: Float
         var counter = 0
         userRef.get().addOnCompleteListener { task ->
@@ -157,6 +162,7 @@ class StepCounterActivity : AppCompatActivity() {
                             stepCounter = ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTimeNoFormat.minusDays(i.toLong()).format(formatter)] as (HashMap<*, *>))["stepCounter"].toString().toFloat()
                         }
                         dataList.add(BarEntry(counter.toFloat(), stepCounter))
+                        xAxisLables.add(currentTimeNoFormat.minusDays(i.toLong()).format(monthDateFormatter))
                         counter++;
                     }
 
@@ -164,10 +170,12 @@ class StepCounterActivity : AppCompatActivity() {
                     barDataSet.color = Color.rgb(65, 75, 178)
                     val barData = BarData(barDataSet)
 
+                    barChart.xAxis.valueFormatter = IndexAxisValueFormatter(xAxisLables)
                     barChart.setFitBars(true)
                     barChart.data = barData
                     barChart.description.text =""
                     barChart.animateY(700, Easing.EaseOutSine)
+                    barChart.setTouchEnabled(false)
 
                     // Update distance and calories burnt according to total steps
                     if ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTime] != null) {
