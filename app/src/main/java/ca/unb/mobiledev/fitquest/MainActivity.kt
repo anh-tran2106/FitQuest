@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -71,9 +72,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.elevation = 0F
-        supportActionBar?.title = intent.getStringExtra("username")
 
         val navView = findViewById<NavigationView>(R.id.navView)
+
         navView.setNavigationItemSelectedListener {
             when(it.itemId) {
                 R.id.miItem1 -> Toast.makeText(applicationContext,
@@ -85,6 +86,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             }
             true
         }
+
+        val header: View = navView.getHeaderView(0)
+        val usernameNavHeader: TextView = header.findViewById(R.id.username_navHeader)
+        usernameNavHeader.text = intent.getStringExtra("username")!!
 
         val stepCardView = findViewById<com.google.android.material.card.MaterialCardView>(R.id.stepCardView)
         stepCardView.setOnClickListener {
