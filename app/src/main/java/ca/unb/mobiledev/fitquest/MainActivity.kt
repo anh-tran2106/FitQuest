@@ -79,8 +79,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             when(it.itemId) {
                 R.id.miItem1 -> Toast.makeText(applicationContext,
                     "Clicked Item 1", Toast.LENGTH_SHORT).show()
-                R.id.miItem2 -> Toast.makeText(applicationContext,
-                    "Clicked Item 2", Toast.LENGTH_SHORT).show()
+                R.id.miItem2 -> {
+                    val intent = Intent(this@MainActivity, ShopActivity::class.java)
+                    intent.putExtra("username", this.intent.getStringExtra("username"))
+                    startActivity(intent)
+                }
                 R.id.miItem3 -> Toast.makeText(applicationContext,
                     "Clicked Item 3", Toast.LENGTH_SHORT).show()
             }
@@ -114,6 +117,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onStart() {
         super.onStart()
         loadData(intent.getStringExtra("username")!!)
+        updateToDate(intent.getStringExtra("username")!!)
     }
 
     override fun onStop() {
