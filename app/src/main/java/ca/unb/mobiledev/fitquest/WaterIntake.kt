@@ -32,6 +32,10 @@ class WaterIntake : AppCompatActivity() {
     private val db = Firebase.firestore
     private var maxWater = 0
     private var waterCounter = 0
+    private var expPoint = 0
+    private var maxExpPoint = 100
+    private var level = 0
+    private var coin = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -84,13 +88,18 @@ class WaterIntake : AppCompatActivity() {
             waterCounterTextView.text = waterCounter.toString()
             updateWaterCounter(username)
 
+            incrementExp(20)
+            updateToDate(username)
         }
 
         minusWaterButton.setOnClickListener {
-            if(waterCounter > 0) {
+            if(waterCounter > 0 && expPoint > 0) {
                 waterCounter--
                 waterCounterTextView.text = waterCounter.toString()
                 updateWaterCounter(username)
+
+                incrementExp(-20)
+                updateToDate(username)
             }
         }
         sendDataToScreen(username)
@@ -126,6 +135,11 @@ class WaterIntake : AppCompatActivity() {
 
                     maxWater = documentSnapshot.data?.get("maxWater").toString().toInt()
                     maxWaterView.text = maxWater.toString()
+
+                    expPoint = documentSnapshot.data?.get("exp").toString().toInt()
+                    maxExpPoint = documentSnapshot.data?.get("maxExp").toString().toInt()
+                    level = documentSnapshot.data?.get("level").toString().toInt()
+                    coin = documentSnapshot.data?.get("coin").toString().toInt()
                 }
             }
         }
@@ -207,6 +221,47 @@ class WaterIntake : AppCompatActivity() {
                     Toast.makeText(
                         this@WaterIntake,
                         "Error while updating",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    Log.d(ContentValues.TAG, e.toString())
+                }
+        }
+    }
+    private fun incrementExp(expPointIncrement : Int) {
+
+        expPoint += expPointIncrement
+        if (expPoint >= maxExpPoint) {
+            levelUp()
+        }
+
+    }
+    private fun levelUp() {
+        level++
+        expPoint = 0
+        maxExpPoint += 50 * (level - 1)
+        coin += 50
+
+        Toast.makeText(this@WaterIntake, "Level Up!", Toast.LENGTH_SHORT).show()
+        updateToDate(intent.getStringExtra("username")!!)
+    }
+
+    private fun updateToDate(username: String) {
+        val userRef = db.collection("users").document(username)
+        userRef.get().addOnCompleteListener { task ->
+            userRef
+                .update(
+                    "coin", coin,
+                    "exp", expPoint,
+                    "level", level,
+                    "maxExp", maxExpPoint,
+                )
+                .addOnSuccessListener {
+                    Toast.makeText(this@WaterIntake, "Updated Exp", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(
+                        this@WaterIntake,
+                        "Error",
                         Toast.LENGTH_SHORT
                     ).show()
                     Log.d(ContentValues.TAG, e.toString())
