@@ -35,6 +35,9 @@ class RecordSleepActivity : AppCompatActivity() {
 
         val username = intent.getStringExtra("username")!!
 
+        supportActionBar?.elevation = 0F
+        supportActionBar?.title = "Sleep"
+
         val picker: nl.joery.timerangepicker.TimeRangePicker = findViewById(R.id.timeRangePicker)
         picker.setOnTimeChangeListener(object : TimeRangePicker.OnTimeChangeListener {
             override fun onStartTimeChange(startTime: TimeRangePicker.Time) {
