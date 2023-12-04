@@ -41,6 +41,7 @@
             app:layout_constraintHorizontal_bias="0.495"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/sleepChart"
+            app:trp_hourFormat="FORMAT_24"
             app:trp_clockFace="SAMSUNG"
             app:trp_endTime="6:30"
             app:trp_sliderRangeGradientEnd="@color/day"
@@ -86,7 +87,7 @@
                         android:layout_height="wrap_content"
                         android:text="sleep"
                         android:textAlignment="center"
-                        android:textColor="?android:textColorPrimary"
+                        android:textColor="@color/primaryTextColor"
                         android:textSize="14sp" />
 
                     <TextView
@@ -94,9 +95,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textAlignment="center"
-                        android:textColor="?android:textColorPrimary"
+                        android:textColor="@color/primaryTextColor"
                         android:textSize="20sp"
-                        tools:text="8:30" />
+                        android:text="8:30" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -137,7 +138,7 @@
                         android:textAlignment="center"
                         android:textColor="?android:textColorPrimary"
                         android:textSize="20sp"
-                        tools:text="8:30" />
+                        android:text="8:30" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
