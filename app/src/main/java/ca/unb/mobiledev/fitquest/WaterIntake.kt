@@ -19,6 +19,7 @@ import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.DefaultValueFormatter
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
@@ -52,7 +53,7 @@ class WaterIntake : AppCompatActivity() {
         val maxWaterView: TextView = findViewById(R.id.maxWater)
         val setWaterTarget: Button = findViewById(R.id.setTargetBtn)
         setWaterTarget.setOnClickListener{
-            val view: View = LayoutInflater.from(this@WaterIntake).inflate(R.layout.layout_max_step_dialog, null)
+            val view: View = LayoutInflater.from(this@WaterIntake).inflate(R.layout.layout_max_water_dialog, null)
             val editText: TextInputEditText = view.findViewById(R.id.editText)
             val alertDialog: AlertDialog = MaterialAlertDialogBuilder(this@WaterIntake)
                 .setTitle("Set Target")
@@ -193,7 +194,8 @@ class WaterIntake : AppCompatActivity() {
                         counter++;
                     }
 
-                    val barDataSet = BarDataSet(dataList,"Cups")
+                    val barDataSet = BarDataSet(dataList,"Glasses")
+                    barDataSet.valueFormatter = DefaultValueFormatter(0)
                     barDataSet.color = Color.rgb(65, 75, 178)
                     val barData = BarData(barDataSet)
 
@@ -203,7 +205,6 @@ class WaterIntake : AppCompatActivity() {
                     barChart.description.text =""
                     barChart.animateY(700, Easing.EaseOutSine)
                     barChart.setTouchEnabled(false)
-                    barChart.animateY(1000)
                 }
             }
         }

@@ -16,6 +16,7 @@ import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.formatter.DefaultValueFormatter
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
@@ -166,6 +167,7 @@ class StepCounterActivity : AppCompatActivity() {
                     }
 
                     val barDataSet = BarDataSet(dataList,"Steps")
+                    barDataSet.valueFormatter = DefaultValueFormatter(0)
                     barDataSet.color = Color.rgb(65, 75, 178)
                     val barData = BarData(barDataSet)
 
