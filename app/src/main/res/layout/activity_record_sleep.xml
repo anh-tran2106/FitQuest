@@ -9,14 +9,17 @@
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/sleepChart"
         android:layout_width="match_parent"
-        android:layout_height="341dp"
+        android:layout_height="290dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="25dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <nl.joery.timerangepicker.TimeRangePicker
         android:id="@+id/timeRangePicker"
-        android:layout_width="300dp"
+        android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -28,14 +31,19 @@
         app:trp_thumbIconEnd="@drawable/ic_alarm"
         app:trp_thumbIconStart="@drawable/ic_moon"
         app:trp_clockFace="SAMSUNG"
-        app:trp_thumbColor="@color/blue"
+        app:trp_sliderWidth="29dp"
+
+        app:trp_sliderRangeGradientStart="@color/night"
+        app:trp_sliderRangeGradientMiddle="@color/middleGradient"
+        app:trp_sliderRangeGradientEnd="@color/day"
+
         />
 
     <Button
         android:id="@+id/setTargetBtn"
         android:layout_width="327dp"
         android:layout_height="53dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:backgroundTint="@color/blue"
         android:text="@string/set_time"
         app:layout_constraintBottom_toBottomOf="parent"

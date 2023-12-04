@@ -8,5 +8,9 @@
     <color name="yellow">#fac710</color>
     <color name="lightBlue">#00F6F6</color>
 
+    <color name="night">#7e82f6</color>
+    <color name="middleGradient">#b77bb9</color>
+    <color name="day">#fd9f00</color>
+
     <color name="primaryTextColor">#FFFFFFFF</color>
 </resources>
