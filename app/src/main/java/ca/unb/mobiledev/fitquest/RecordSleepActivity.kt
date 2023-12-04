@@ -1,18 +1,10 @@
 package ca.unb.mobiledev.fitquest
 
-import android.content.ContentValues
+import android.content.res.Resources
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.InputType
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import com.github.mikephil.charting.animation.Easing
 import java.time.LocalDate
 import com.github.mikephil.charting.charts.BarChart;
@@ -21,12 +13,17 @@ import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.DefaultValueFormatter
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import nl.joery.timerangepicker.TimeRangePicker
 import java.time.format.DateTimeFormatter
+import android.content.ContentValues
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
+
+
 class RecordSleepActivity : AppCompatActivity() {
     private val db = Firebase.firestore
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,35 +35,89 @@ class RecordSleepActivity : AppCompatActivity() {
         supportActionBar?.elevation = 0F
         supportActionBar?.title = "Sleep"
 
-        val picker: nl.joery.timerangepicker.TimeRangePicker = findViewById(R.id.timeRangePicker)
+        updateTimes()
+        updateDuration()
+        val picker: TimeRangePicker = findViewById(R.id.timeRangePicker)
+
         picker.setOnTimeChangeListener(object : TimeRangePicker.OnTimeChangeListener {
             override fun onStartTimeChange(startTime: TimeRangePicker.Time) {
-                Log.d("TimeRangePicker", "Start time: " + startTime)
+                updateTimes()
             }
 
             override fun onEndTimeChange(endTime: TimeRangePicker.Time) {
-                Log.d("TimeRangePicker", "End time: " + endTime.hour)
+                updateTimes()
             }
 
             override fun onDurationChange(duration: TimeRangePicker.TimeDuration) {
-                Log.d("TimeRangePicker", "Duration: " + duration.hour)
+                updateDuration()
             }
         })
 
         picker.setOnDragChangeListener(object : TimeRangePicker.OnDragChangeListener {
             override fun onDragStart(thumb: TimeRangePicker.Thumb): Boolean {
-                // Do something on start dragging
-                return true // Return false to disallow the user from dragging a handle.
+                if(thumb != TimeRangePicker.Thumb.BOTH) {
+                    animate(thumb, true)
+                }
+                return true
             }
 
             override fun onDragStop(thumb: TimeRangePicker.Thumb) {
-                // Do something on stop dragging
+                if(thumb != TimeRangePicker.Thumb.BOTH) {
+                    animate(thumb, false)
+                }
+
+                Log.d(
+                    "TimeRangePicker",
+                    "Start time: " + picker.startTime
+                )
+                Log.d(
+                    "TimeRangePicker",
+                    "End time: " + picker.endTime
+                )
+                Log.d(
+                    "TimeRangePicker",
+                    "Total duration: " + picker.duration
+                )
             }
         })
 
         sendDataToScreen(username)
         handleSetTimeClick()
     }
+
+    private fun updateTimes() {
+        val picker: TimeRangePicker = findViewById(R.id.timeRangePicker)
+        val end_time: TextView = findViewById(R.id.end_time)
+        end_time.text = picker.endTime.toString()
+        val start_time: TextView = findViewById(R.id.start_time)
+        start_time.text = picker.startTime.toString()
+    }
+
+    private fun updateDuration() {
+        val picker: TimeRangePicker = findViewById(R.id.timeRangePicker)
+        val duration: TextView = findViewById(R.id.duration)
+        duration.text = picker.duration.toString()
+    }
+
+    private fun animate(thumb: TimeRangePicker.Thumb, active: Boolean) {
+        val bedtime_layout = findViewById<LinearLayout>(R.id.bedtime_layout)
+        val wake_layout = findViewById<LinearLayout>(R.id.wake_layout)
+        val activeView = if(thumb == TimeRangePicker.Thumb.START) bedtime_layout else wake_layout
+        val inactiveView = if(thumb == TimeRangePicker.Thumb.START) wake_layout else bedtime_layout
+        val direction = if(thumb == TimeRangePicker.Thumb.START) 1 else -1
+
+        activeView
+            .animate()
+            .translationY(if(active) (activeView.measuredHeight / 2f)*direction else 0f)
+            .setDuration(300)
+            .start()
+        inactiveView
+            .animate()
+            .alpha(if(active) 0f else 1f)
+            .setDuration(300)
+            .start()
+    }
+
     private fun sendDataToScreen(username: String) {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val monthDateFormatter = DateTimeFormatter.ofPattern("M/d")
