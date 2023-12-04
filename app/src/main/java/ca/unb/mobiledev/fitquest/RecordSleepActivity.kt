@@ -92,7 +92,8 @@ class RecordSleepActivity : AppCompatActivity() {
                         counter++;
                     }
 
-                    val barDataSet = BarDataSet(dataList,"Steps")
+                    val barDataSet = BarDataSet(dataList,"Hours of Sleep")
+                    barDataSet.setDrawValues(false)
                     barDataSet.valueFormatter = DefaultValueFormatter(2)
                     barDataSet.color = Color.rgb(65, 75, 178)
                     val barData = BarData(barDataSet)
