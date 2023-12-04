@@ -124,8 +124,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         loadData(intent.getStringExtra("username")!!)
         changeWaterCounter(this.intent.getStringExtra("username")!!)
 
-        resetStepsForLongClick()
-
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
     }
 
@@ -331,7 +329,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     "allDays.${currentTime}.sleepTime", sleepTime
                 )
                 .addOnSuccessListener {
-                    Toast.makeText(this@MainActivity, "Today added!", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(this@MainActivity, "Today added!", Toast.LENGTH_SHORT).show()
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(

@@ -125,7 +125,7 @@ class StepCounterActivity : AppCompatActivity() {
                     "maxStep", stepTarget,
                 )
                 .addOnSuccessListener {
-                    Toast.makeText(this@StepCounterActivity, "Step Target Updated", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(this@StepCounterActivity, "Step Target Updated", Toast.LENGTH_SHORT).show()
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(

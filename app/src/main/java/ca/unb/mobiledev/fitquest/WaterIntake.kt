@@ -254,7 +254,7 @@ class WaterIntake : AppCompatActivity() {
                     "maxExp", maxExpPoint,
                 )
                 .addOnSuccessListener {
-                    Toast.makeText(this@WaterIntake, "Updated Exp", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(this@WaterIntake, "Updated Exp", Toast.LENGTH_SHORT).show()
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(

@@ -57,7 +57,7 @@ class ShopActivity : AppCompatActivity() {
                     "coin", coin,
                 )
                 .addOnSuccessListener {
-                    Toast.makeText(this@ShopActivity, "Coin value Updated", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(this@ShopActivity, "Coin value Updated", Toast.LENGTH_SHORT).show()
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(
@@ -79,7 +79,7 @@ class ShopActivity : AppCompatActivity() {
                     "health", health,
                 )
                 .addOnSuccessListener {
-                    Toast.makeText(this@ShopActivity, "Health value Updated", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(this@ShopActivity, "Health value Updated", Toast.LENGTH_SHORT).show()
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(
