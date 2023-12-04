@@ -1,6 +1,10 @@
 <h1 align="center">🏃 FitQuest 🕹️</h1>
 
 <p align="center">
+  <img alt="Android" src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white">
+</p>
+
+<p align="center">
   A Fusion of Fitness Apps and Game Features, FitQuest aims to keep users motivated on their fitness journey through gamification.
 </p>
 
