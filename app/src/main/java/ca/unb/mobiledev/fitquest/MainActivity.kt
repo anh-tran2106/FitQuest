@@ -265,6 +265,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                         waterCounterTextView.text = waterCounter.toString()
 
                         maxStepAchieved = ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTime] as (HashMap<*, *>))["maxStepAchieved"] as Boolean
+                        sleepTime = ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTime] as (HashMap<*, *>))["sleepTime"].toString().toFloat()
                     }
 
                     healthPoint = documentSnapshot.data?.get("health").toString().toInt()
@@ -291,8 +292,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
                     maxWater = documentSnapshot.data?.get("maxWater").toString().toInt()
                     maxWaterTextView.text = maxWater.toString()
-
-                    sleepTime = documentSnapshot.data?.get("sleepTime").toString().toFloat()
                 }
             }
         }
