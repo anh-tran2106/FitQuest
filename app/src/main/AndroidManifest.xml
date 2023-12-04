@@ -13,7 +13,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FitQuest"
-        tools:targetApi="31" >
+        tools:targetApi="31">
+        <activity
+            android:name=".RecordSleepActivity"
+            android:exported="false" />
         <activity
             android:name=".ShopActivity"
             android:exported="false" />
@@ -25,7 +28,7 @@
             android:exported="false" />
         <activity
             android:name=".LoginActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -106,6 +106,19 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             intent.putExtra("username",this.intent.getStringExtra("username"))
             startActivity(intent)
         }
+        val sleepCardView = findViewById<com.google.android.material.card.MaterialCardView>(R.id.sleepCardView)
+        sleepCardView.setOnClickListener {
+            val intent = Intent(this@MainActivity, RecordSleepActivity::class.java)
+            intent.putExtra("username",this.intent.getStringExtra("username"))
+            startActivity(intent)
+        }
+
+        val sleepButton = findViewById<Button>(R.id.recordSleepButton)
+        sleepButton.setOnClickListener {
+            val intent = Intent(this@MainActivity, RecordSleepActivity::class.java)
+            intent.putExtra("username",this.intent.getStringExtra("username"))
+            startActivity(intent)
+        }
 
         loadData(intent.getStringExtra("username")!!)
         changeWaterCounter(this.intent.getStringExtra("username")!!)

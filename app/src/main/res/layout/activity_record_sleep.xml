@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RecordSleepActivity">
+
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/sleepChart"
+        android:layout_width="match_parent"
+        android:layout_height="341dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <nl.joery.timerangepicker.TimeRangePicker
+        android:id="@+id/timeRangePicker"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sleepChart"
+        app:trp_endTime="6:30"
+        app:trp_startTime="22:00"
+        app:trp_thumbIconEnd="@drawable/ic_alarm"
+        app:trp_thumbIconStart="@drawable/ic_moon"
+        app:trp_clockFace="SAMSUNG"
+        app:trp_thumbColor="@color/blue"
+        />
+
+    <Button
+        android:id="@+id/setTargetBtn"
+        android:layout_width="327dp"
+        android:layout_height="53dp"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="@color/blue"
+        android:text="@string/set_time"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/timeRangePicker"
+        app:layout_constraintVertical_bias="0.157" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
