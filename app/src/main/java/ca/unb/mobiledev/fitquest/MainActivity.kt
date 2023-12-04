@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var maxStepAchieved = false
     private var waterCounter = 0
     private var maxWater = 0
+    private var sleepTime = 0f
 
     private var healthPoint = 100
     private var expPoint = 0
@@ -290,6 +291,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
                     maxWater = documentSnapshot.data?.get("maxWater").toString().toInt()
                     maxWaterTextView.text = maxWater.toString()
+
+                    sleepTime = documentSnapshot.data?.get("sleepTime").toString().toFloat()
                 }
             }
         }
@@ -325,7 +328,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     "maxWater", maxWater,
                     "allDays.${currentTime}.stepCounter", totalSteps - previousTotalSteps,
                     "allDays.${currentTime}.waterCounter", waterCounter,
-                    "allDays.${currentTime}.maxStepAchieved", maxStepAchieved
+                    "allDays.${currentTime}.maxStepAchieved", maxStepAchieved,
+                    "allDays.${currentTime}.sleepTime", sleepTime
                 )
                 .addOnSuccessListener {
                     Toast.makeText(this@MainActivity, "Today added!", Toast.LENGTH_SHORT).show()
