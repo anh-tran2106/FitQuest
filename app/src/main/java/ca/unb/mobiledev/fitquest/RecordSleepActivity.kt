@@ -18,6 +18,7 @@ import com.google.firebase.firestore.firestore
 import nl.joery.timerangepicker.TimeRangePicker
 import java.time.format.DateTimeFormatter
 import android.content.ContentValues
+import android.content.res.Configuration
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -150,6 +151,19 @@ class RecordSleepActivity : AppCompatActivity() {
                     barDataSet.setDrawValues(false)
                     barDataSet.valueFormatter = DefaultValueFormatter(2)
                     barDataSet.color = Color.rgb(65, 75, 178)
+
+
+                    val isNightMode = applicationContext.resources.configuration.uiMode and
+                            Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+
+                    if (isNightMode) {
+                        barDataSet.valueTextColor = Color.rgb(255, 255, 255)
+                        barChart.xAxis.textColor = Color.rgb(255, 255, 255)
+                        barChart.axisLeft.textColor = Color.rgb(255, 255, 255)
+                        barChart.axisRight.textColor = Color.rgb(255, 255, 255)
+                        barChart.legend.textColor = Color.rgb(255, 255, 255)
+                    }
+
                     val barData = BarData(barDataSet)
 
                     barChart.xAxis.valueFormatter = IndexAxisValueFormatter(xAxisLables)

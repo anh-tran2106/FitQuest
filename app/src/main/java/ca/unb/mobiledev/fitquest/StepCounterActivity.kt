@@ -1,6 +1,7 @@
 package ca.unb.mobiledev.fitquest
 
 import android.content.ContentValues
+import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -169,6 +170,18 @@ class StepCounterActivity : AppCompatActivity() {
                     val barDataSet = BarDataSet(dataList,"Steps")
                     barDataSet.valueFormatter = DefaultValueFormatter(0)
                     barDataSet.color = Color.rgb(65, 75, 178)
+
+                    val isNightMode = applicationContext.resources.configuration.uiMode and
+                            Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+
+                    if (isNightMode) {
+                        barDataSet.valueTextColor = Color.rgb(255, 255, 255)
+                        barChart.xAxis.textColor = Color.rgb(255, 255, 255)
+                        barChart.axisLeft.textColor = Color.rgb(255, 255, 255)
+                        barChart.axisRight.textColor = Color.rgb(255, 255, 255)
+                        barChart.legend.textColor = Color.rgb(255, 255, 255)
+                    }
+
                     val barData = BarData(barDataSet)
 
                     barChart.xAxis.valueFormatter = IndexAxisValueFormatter(xAxisLables)
