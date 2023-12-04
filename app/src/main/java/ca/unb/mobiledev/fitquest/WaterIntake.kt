@@ -1,109 +1,217 @@
 package ca.unb.mobiledev.fitquest
 
+import android.content.ContentValues
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import com.github.mikephil.charting.animation.Easing
 import java.time.LocalDate
-import java.time.LocalDateTime
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
+import java.time.format.DateTimeFormatter
+import kotlin.math.max
 
 class WaterIntake : AppCompatActivity() {
     private lateinit var barChart: BarChart
+    private val db = Firebase.firestore
+    private var maxWater = 0
+    private var waterCounter = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_water_intake)
 
-        val sharedPreferences = getSharedPreferences("SP_INFO", MODE_PRIVATE)
-        var waterCount= sharedPreferences.getString("WATERCOUNT", "0")
-        var editor = sharedPreferences.edit()
+        val username = intent.getStringExtra("username")!!
 
-        var target = 0;
+        supportActionBar?.elevation = 0F
+        supportActionBar?.title = "Water"
 
-        val addButton: Button = findViewById(R.id.addWater_Button)
-        val waterCount_Text: TextView = findViewById(R.id.waterCount_textView)
-        waterCount_Text.text = waterCount
-        addButton.setOnClickListener{
-            waterCount_Text.text = (Integer.parseInt(waterCount_Text.text as String) + 1).toString()
-            editor.putString("WATERCOUNT", waterCount_Text.text as String)
-            editor.apply()
-            if(Integer.parseInt(waterCount_Text.text as String) >= target){
-                Toast.makeText(this, "Congrats! You reached your target!", Toast.LENGTH_SHORT).show()
+        loadData(username)
+
+        val maxWaterView: TextView = findViewById(R.id.maxWater)
+        val setWaterTarget: Button = findViewById(R.id.setTargetBtn)
+        setWaterTarget.setOnClickListener{
+            val view: View = LayoutInflater.from(this@WaterIntake).inflate(R.layout.layout_max_step_dialog, null)
+            val editText: TextInputEditText = view.findViewById(R.id.editText)
+            val alertDialog: AlertDialog = MaterialAlertDialogBuilder(this@WaterIntake)
+                .setTitle("Set Target")
+                .setView(view)
+                .setPositiveButton("Ok") { _, _ ->
+                    val targetInput = editText.text.toString()
+                    if (targetInput.isNotEmpty()) {
+                        maxWater = targetInput.toInt()
+                        maxWaterView.text = maxWater.toString()
+
+                        Toast.makeText(this, "Target set to $maxWater", Toast.LENGTH_SHORT).show()
+                        updateWaterTarget(intent.getStringExtra("username")!!)
+                    } else {
+                        Toast.makeText(this, "Please enter a valid number", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .setNegativeButton("Cancel", null).create()
+
+            alertDialog.setOnShowListener {
+                alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor( resources.getColor(R.color.primaryTextColor, theme))
+                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor( resources.getColor(R.color.primaryTextColor, theme))
+            }
+
+            alertDialog.show()
+        }
+
+        val waterCounterTextView : TextView = findViewById(R.id.waterCount_textView)
+        val addWaterButton : Button = findViewById(R.id.addWater_Button)
+        val minusWaterButton : Button = findViewById(R.id.minusWater_Button)
+
+        addWaterButton.setOnClickListener {
+            waterCounter++
+            waterCounterTextView.text = waterCounter.toString()
+            updateWaterCounter(username)
+
+        }
+
+        minusWaterButton.setOnClickListener {
+            if(waterCounter > 0) {
+                waterCounter--
+                waterCounterTextView.text = waterCounter.toString()
+                updateWaterCounter(username)
             }
         }
-        val setTarget: Button = findViewById(R.id.setTargetBtn)
-        setTarget.setOnClickListener {
-            val builder = AlertDialog.Builder(this)
-            builder.setTitle("Set Target")
+        sendDataToScreen(username)
+    }
 
-            val input = EditText(this)
-            input.inputType = InputType.TYPE_CLASS_NUMBER
-            builder.setView(input)
+    override fun onStart() {
+        super.onStart()
+        val username = intent.getStringExtra("username")!!
+        loadData(username)
+    }
 
-            builder.setPositiveButton("OK") { _, _ ->
-                val targetInput = input.text.toString()
-                if (targetInput.isNotEmpty()) {
-                    target = targetInput.toInt()
-                    Toast.makeText(this, "Target set to $target", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Please enter a valid number", Toast.LENGTH_SHORT).show()
+    override fun onStop() {
+        super.onStop()
+        updateWaterCounter(intent.getStringExtra("username")!!)
+    }
+
+    private fun loadData(username: String) {
+        val currentTime = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        val userRef = db.collection("users").document(username)
+
+        val waterCounterView: TextView = findViewById(R.id.waterCount_textView)
+        val maxWaterView: TextView = findViewById(R.id.maxWater)
+
+
+        userRef.get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val documentSnapshot = task.result
+                if (documentSnapshot.exists()) {
+                    if ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTime] != null) {
+                        waterCounter = ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTime] as (HashMap<*, *>))["waterCounter"].toString().toInt()
+                        waterCounterView.text = waterCounter.toString()
+                    }
+
+                    maxWater = documentSnapshot.data?.get("maxWater").toString().toInt()
+                    maxWaterView.text = maxWater.toString()
                 }
             }
-            builder.show()
         }
+    }
 
-        val minusButton: Button = findViewById(R.id.minusWater_Button)
+    private fun updateWaterTarget(username: String) {
+        val userRef = db.collection("users").document(username)
+        userRef.get().addOnCompleteListener {
+            userRef
+                .update(
+                    "maxWater", maxWater,
+                )
+                .addOnSuccessListener {
+                    Toast.makeText(this@WaterIntake, "Water Target Updated", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(
+                        this@WaterIntake,
+                        "Error while updating water target",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    Log.d(ContentValues.TAG, e.toString())
+                }
+        }
+    }
 
-        minusButton.setOnClickListener {
-            if(Integer.parseInt(waterCount_Text.text as String) > 0) {
-                waterCount_Text.text =
-                    (Integer.parseInt(waterCount_Text.text as String) - 1).toString()
-                editor.putString("WATERCOUNT", waterCount_Text.text as String)
-                editor.apply()
+    private fun sendDataToScreen(username: String) {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val monthDateFormatter = DateTimeFormatter.ofPattern("M/d")
+        val currentTimeNoFormat = LocalDate.now()
+        val userRef = db.collection("users").document(username)
+
+        val barChart = findViewById<BarChart>(R.id.waterChart)
+        val dataList: ArrayList<BarEntry> = ArrayList()
+        val xAxisLables: MutableList<String> = ArrayList()
+        var waterCounter: Float
+        var counter = 0
+        userRef.get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val documentSnapshot = task.result
+                if (documentSnapshot.exists()) {
+
+                    // Update water data for 7 days up to the current date to the chart
+                    for (i in 6 downTo 0) {
+                        waterCounter = 0f
+                        if ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTimeNoFormat.minusDays(i.toLong()).format(formatter)] != null) {
+                            waterCounter = ((documentSnapshot.data?.get("allDays") as (HashMap<*, *>))[currentTimeNoFormat.minusDays(i.toLong()).format(formatter)] as (HashMap<*, *>))["waterCounter"].toString().toFloat()
+                        }
+                        dataList.add(BarEntry(counter.toFloat(), waterCounter))
+                        xAxisLables.add(currentTimeNoFormat.minusDays(i.toLong()).format(monthDateFormatter))
+                        counter++;
+                    }
+
+                    val barDataSet = BarDataSet(dataList,"Cups")
+                    barDataSet.color = Color.rgb(65, 75, 178)
+                    val barData = BarData(barDataSet)
+
+                    barChart.xAxis.valueFormatter = IndexAxisValueFormatter(xAxisLables)
+                    barChart.setFitBars(true)
+                    barChart.data = barData
+                    barChart.description.text =""
+                    barChart.animateY(700, Easing.EaseOutSine)
+                    barChart.setTouchEnabled(false)
+                    barChart.animateY(1000)
+                }
             }
-            else{
-                Toast.makeText(this, "Action not available!", Toast.LENGTH_SHORT).show()
-            }
         }
+    }
+    private fun updateWaterCounter(username: String) {
+        val currentTime = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 
-
-
-        val currentDate = LocalDateTime.now().toString()
-        var pastTime: String? = sharedPreferences.getString("PASTTIME", "2023-01-01").toString()
-        if (pastTime != currentDate){
-            editor.putString("PASTTIME", currentDate)
-            waterCount_Text.text = "0"
-            editor.putString("WATERCOUNT",  "0")
-            editor.apply()
+        val userRef = db.collection("users").document(username)
+        userRef.get().addOnCompleteListener { task ->
+            userRef
+                .update(
+                    "allDays.${currentTime}.waterCounter", waterCounter,
+                )
+                .addOnFailureListener { e ->
+                    Toast.makeText(
+                        this@WaterIntake,
+                        "Error while updating",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    Log.d(ContentValues.TAG, e.toString())
+                }
         }
-
-        barChart = findViewById<BarChart>(R.id.waterChart)
-        val list:ArrayList<BarEntry> = ArrayList()
-
-        list.add(BarEntry(0.toFloat(), 13.toFloat()))
-        list.add(BarEntry(1.toFloat(), 23.toFloat()))
-        list.add(BarEntry(2.toFloat(), 4.toFloat()))
-        list.add(BarEntry(3.toFloat(), 28.toFloat()))
-        list.add(BarEntry(4.toFloat(), 51.toFloat()))
-
-        val barDataSet = BarDataSet(list,"Cups of Water")
-        barDataSet.setColor(Color.GREEN, 255)
-
-        val barData = BarData(barDataSet)
-
-        barChart.setFitBars(true)
-        barChart.data = barData
-        barChart.description.text ="Daily Water Intake"
-        barChart.animateY(2000)
     }
 }
 

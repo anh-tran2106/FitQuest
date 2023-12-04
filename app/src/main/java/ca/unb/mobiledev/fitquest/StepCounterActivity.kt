@@ -75,7 +75,6 @@ class StepCounterActivity : AppCompatActivity() {
 
             alertDialog.show()
         }
-
         sendDataToScreen(username)
     }
 

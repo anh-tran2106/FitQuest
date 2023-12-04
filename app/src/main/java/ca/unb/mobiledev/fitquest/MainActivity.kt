@@ -103,11 +103,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val waterCardView = findViewById<com.google.android.material.card.MaterialCardView>(R.id.waterCardView)
         waterCardView.setOnClickListener {
             val intent = Intent(this@MainActivity, WaterIntake::class.java)
+            intent.putExtra("username",this.intent.getStringExtra("username"))
             startActivity(intent)
         }
 
         loadData(intent.getStringExtra("username")!!)
-        changeWaterCounter()
+        changeWaterCounter(this.intent.getStringExtra("username")!!)
 
         resetStepsForLongClick()
 
@@ -163,7 +164,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
-    private fun changeWaterCounter() {
+    private fun changeWaterCounter(username: String) {
         val waterCounterTextView : TextView = findViewById(R.id.waterTaken)
         val addWaterButton : Button = findViewById(R.id.addWater)
         val removeWaterButton : Button = findViewById(R.id.removeWater)
@@ -173,6 +174,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             waterCounterTextView.text = waterCounter.toString()
 
             incrementExp(20)
+            updateWaterCounter(username)
         }
 
         removeWaterButton.setOnClickListener {
@@ -181,6 +183,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 waterCounterTextView.text = waterCounter.toString()
 
                 incrementExp(-20)
+                updateWaterCounter(username)
             }
         }
     }
@@ -367,6 +370,25 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             maxStepAchieved = true
             updateToDate(intent.getStringExtra("username")!!)
             Toast.makeText(this@MainActivity, "Step Goal Achieved!", Toast.LENGTH_SHORT).show()
+        }
+    }
+    private fun updateWaterCounter(username: String) {
+        val currentTime = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+
+        val userRef = db.collection("users").document(username)
+        userRef.get().addOnCompleteListener { task ->
+            userRef
+                .update(
+                    "allDays.${currentTime}.waterCounter", waterCounter,
+                )
+                .addOnFailureListener { e ->
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Error while updating",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    Log.d(ContentValues.TAG, e.toString())
+                }
         }
     }
 }
