@@ -1,7 +1,7 @@
 <h1 align="center">🏃 FitQuest 🕹️</h1>
 
 <p align="center">
-  A Fusion of Fitness Apps and Game Achievements, FitQuest aims to keep users motivated on their fitness journey through gamification.
+  A Fusion of Fitness Apps and Game Features, FitQuest aims to keep users motivated on their fitness journey through gamification.
 </p>
 
 ## Screenshots
