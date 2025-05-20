@@ -2,6 +2,7 @@
 
 <p align="center">
   <img alt="Android" src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white">
+  <img alt="Firebase" src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=white">
 </p>
 
 <p align="center">
@@ -18,3 +19,9 @@
   <img src="https://github.com/anh-tran2106/FitQuest/assets/84007510/8e720f91-cc34-4d9d-a22d-f00da9634117" width="250" />
   <img src="https://github.com/anh-tran2106/FitQuest/assets/84007510/28bf7720-ab7c-47b9-b975-79411e108a0b" width="250" />
 </p>
+
+## Libraries used
+- [MPAndroidChart](https://github.com/PhilJay/MPAndroidChart)
+- [CircularProgressBar](https://github.com/lopspower/CircularProgressBar)
+- [TimeRangePicker](https://github.com/Droppers/TimeRangePicker)
+
